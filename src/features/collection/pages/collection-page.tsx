@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { CollectionCard } from '../components/collection-card'
 import { useCollectionData } from '../hooks/use-collection-data'
 
@@ -26,6 +27,7 @@ export function CollectionPage() {
           <p className="section-kicker">The shared shelf · 2025</p>
           <h1>Records worth<br /><em>coming back to.</em></h1>
           <p className="intro-copy">A growing archive of the music that makes the room feel right.</p>
+          <Link className="primary-button intro-action" to="/albums/new">Add an album <span aria-hidden="true">+</span></Link>
         </div>
         <div className="collection-stat"><strong>{albums.length}</strong><span>albums<br />in the room</span></div>
       </section>

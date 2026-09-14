@@ -7,13 +7,27 @@ const delay = async (): Promise<void> => {
 }
 
 export class MockAlbumRepository implements AlbumRepository {
+  private albums = [...mockAlbums]
+
   async getAlbums(): Promise<Album[]> {
     await delay()
-    return mockAlbums
+    return [...this.albums]
   }
 
   async getAlbumById(id: AlbumId): Promise<Album | undefined> {
     await delay()
-    return mockAlbums.find((album) => album.id === id)
+    return this.albums.find((album) => album.id === id)
+  }
+
+  async createAlbum(album: Album): Promise<Album> {
+    await delay()
+    this.albums.push(album)
+    return album
+  }
+
+  async updateAlbum(album: Album): Promise<Album> {
+    await delay()
+    this.albums = this.albums.map((currentAlbum) => currentAlbum.id === album.id ? album : currentAlbum)
+    return album
   }
 }

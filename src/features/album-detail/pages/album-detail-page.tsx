@@ -31,7 +31,7 @@ export function AlbumDetailPage() {
           <ol className="tracklist">{album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><time>{track.duration}</time></li>)}</ol>
         </section>
         <section className="copies-section">
-          <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><span>{items.length} total</span></div>
+          <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><div className="section-heading-actions"><span>{items.length} total</span><Link className="text-action" to={`/albums/${album.id}/items/new`}>Add copy +</Link></div></div>
           <div className="item-list">{items.map((item) => <CollectionItemRow item={item} owner={owners.find((owner) => owner.id === item.ownerId)} key={item.id} />)}</div>
         </section>
       </div>

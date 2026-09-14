@@ -10,13 +10,27 @@ const delay = async (): Promise<void> => {
 }
 
 export class MockCollectionItemRepository implements CollectionItemRepository {
+  private items = [...mockCollectionItems]
+
   async getCollectionItems(): Promise<CollectionItem[]> {
     await delay()
-    return mockCollectionItems
+    return [...this.items]
   }
 
   async getCollectionItemById(id: CollectionItemId): Promise<CollectionItem | undefined> {
     await delay()
-    return mockCollectionItems.find((item) => item.id === id)
+    return this.items.find((item) => item.id === id)
+  }
+
+  async createCollectionItem(item: CollectionItem): Promise<CollectionItem> {
+    await delay()
+    this.items.push(item)
+    return item
+  }
+
+  async updateCollectionItem(item: CollectionItem): Promise<CollectionItem> {
+    await delay()
+    this.items = this.items.map((currentItem) => currentItem.id === item.id ? item : currentItem)
+    return item
   }
 }
