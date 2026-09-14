@@ -8,8 +8,8 @@ type YouTubeTrackPlayerProps = {
 }
 
 type YouTubePlayerEvent = { data: number }
-type YouTubePlayer = { destroy: () => void }
-type YouTubePlayerConstructor = new (element: HTMLIFrameElement, options: { events: { onStateChange: (event: YouTubePlayerEvent) => void } }) => YouTubePlayer
+type YouTubePlayer = { destroy: () => void; loadVideoById: (videoId: string) => void }
+type YouTubePlayerConstructor = new (element: HTMLElement, options: { host: string; videoId: string; playerVars: { autoplay: number; origin: string; rel: number }; events: { onStateChange: (event: YouTubePlayerEvent) => void } }) => YouTubePlayer
 
 declare global {
   interface Window {
@@ -53,18 +53,21 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
   const playableTracks = useMemo(() => tracks.map((track) => ({ track, videoId: getVideoId(mediaLinks.find((link) => link.trackId === track.id)?.url ?? '') })).filter((entry): entry is { track: Track; videoId: string } => Boolean(entry.videoId)), [mediaLinks, tracks])
   const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(playableTracks[0]?.track.id)
   const selectedTrack = playableTracks.find((entry) => entry.track.id === selectedTrackId)
-  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const playerContainerRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<YouTubePlayer | null>(null)
 
   useEffect(() => {
-    if (!selectedTrack) return
+    if (playableTracks.length === 0 || !selectedTrack) return
     let cancelled = false
     playerRef.current?.destroy()
     playerRef.current = null
 
     loadYouTubeApi().then(() => {
-      if (cancelled || !iframeRef.current || !window.YT) return
-      playerRef.current = new window.YT.Player(iframeRef.current, {
+      if (cancelled || !playerContainerRef.current || !window.YT) return
+      playerRef.current = new window.YT.Player(playerContainerRef.current, {
+        host: 'https://www.youtube-nocookie.com',
+        videoId: playableTracks[0].videoId,
+        playerVars: { autoplay: 1, origin: window.location.origin, rel: 0 },
         events: {
           onStateChange: (event) => {
             if (event.data !== window.YT?.PlayerState.ENDED) return
@@ -81,20 +84,17 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
       playerRef.current?.destroy()
       playerRef.current = null
     }
-  }, [playableTracks, selectedTrack])
+  }, [playableTracks])
+
+  useEffect(() => {
+    if (selectedTrack && playerRef.current) playerRef.current.loadVideoById(selectedTrack.videoId)
+  }, [selectedTrack])
 
   if (playableTracks.length === 0) return <div className="player-empty">Add track-specific YouTube URLs while editing this album to play it here.</div>
 
-  const appOrigin = window.location.origin
-  const playerUrl = selectedTrack
-    ? `https://www.youtube-nocookie.com/embed/${selectedTrack.videoId}?autoplay=1&rel=0&origin=${encodeURIComponent(appOrigin)}&widget_referrer=${encodeURIComponent(appOrigin)}`
-    : undefined
-
   return (
     <section className="music-player" aria-label="Album player">
-      <div className="player-frame">
-        {selectedTrack && playerUrl && <iframe key={selectedTrack.videoId} ref={iframeRef} title={`YouTube player for ${selectedTrack.track.title}`} src={`${playerUrl}&enablejsapi=1`} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />}
-      </div>
+      <div className="player-frame" ref={playerContainerRef} data-testid="youtube-player-container" aria-label={selectedTrack ? `YouTube player for ${selectedTrack.track.title}` : 'YouTube player'} />
       <div className="player-now-playing"><span>Now playing</span><strong>{selectedTrack?.track.title}</strong></div>
       <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><RatingStars rating={track.rating} /><time>{track.duration}</time></button>)}</div>
     </section>

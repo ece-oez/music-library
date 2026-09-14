@@ -19,14 +19,9 @@ describe('YouTubeTrackPlayer', () => {
       />,
     )
 
-    const firstPlayer = screen.getByTitle('YouTube player for First song')
-    expect(firstPlayer).toHaveAttribute('src', expect.stringContaining('/embed/firstVideo'))
-    expect(firstPlayer).toHaveAttribute('src', expect.stringContaining(`origin=${encodeURIComponent(window.location.origin)}`))
-    expect(firstPlayer).toHaveAttribute('src', expect.stringContaining(`widget_referrer=${encodeURIComponent(window.location.origin)}`))
-    expect(firstPlayer).toHaveAttribute('src', expect.stringContaining('enablejsapi=1'))
-    expect(firstPlayer).toHaveAttribute('referrerpolicy', 'strict-origin-when-cross-origin')
+    expect(screen.getByTestId('youtube-player-container')).toHaveAttribute('aria-label', 'YouTube player for First song')
     await user.click(screen.getByRole('button', { name: /Second song/ }))
-    expect(screen.getByTitle('YouTube player for Second song')).toHaveAttribute('src', expect.stringContaining('/embed/secondVideo'))
+    expect(screen.getByTestId('youtube-player-container')).toHaveAttribute('aria-label', 'YouTube player for Second song')
   })
 
   it('explains when an album has no playable track links', () => {
