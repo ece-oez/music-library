@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { calculateAlbumRating } from '../../../domain/album/album-rating'
 import type { Album } from '../../../domain/album/album.types'
 import type { CollectionItem, Owner } from '../../../domain/collection-item/collection-item.types'
 import { AlbumArtwork } from '../../../shared/components/album-artwork'
@@ -25,7 +26,7 @@ export function CollectionCard({ album, items, owners }: CollectionCardProps) {
             <h2><Link to={`/albums/${album.id}`}>{album.title}</Link></h2>
             <p className="artist-name">{album.artists.map((artist) => artist.name).join(', ')}</p>
           </div>
-          <RatingStars rating={album.rating} />
+          <RatingStars rating={calculateAlbumRating(album)} />
         </div>
         <div className="collection-card-meta">
           <div className="format-stack">

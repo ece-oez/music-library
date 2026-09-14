@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { MediaLink, Track } from '../../../domain/album/album.types'
+import { RatingStars } from '../../../shared/components/rating-stars'
 
 type YouTubeTrackPlayerProps = {
   tracks: Track[]
@@ -39,7 +40,7 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
         {selectedTrack && playerUrl && <iframe key={selectedTrack.videoId} title={`YouTube player for ${selectedTrack.track.title}`} src={playerUrl} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />}
       </div>
       <div className="player-now-playing"><span>Now playing</span><strong>{selectedTrack?.track.title}</strong></div>
-      <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><time>{track.duration}</time></button>)}</div>
+      <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><RatingStars rating={track.rating} /><time>{track.duration}</time></button>)}</div>
     </section>
   )
 }

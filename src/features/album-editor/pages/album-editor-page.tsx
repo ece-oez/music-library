@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { calculateAlbumRating } from '../../../domain/album/album-rating'
 import type { Album, Track } from '../../../domain/album/album.types'
 import { repositories } from '../../../infrastructure/repositories'
 
@@ -53,13 +54,14 @@ function AlbumEditorForm({ albumId, initialAlbum }: AlbumEditorFormProps) {
       genres: [{ id: initialAlbum?.genres[0]?.id ?? createId('genre'), name: genre.trim() }],
       tags: initialAlbum?.tags ?? [],
       artwork: { url: artworkUrl.trim() || fallbackArtwork, alt: `${title.trim()} artwork`, source: 'mock' },
-      tracks: tracksToSave.map((track) => ({ id: track.id, title: track.title.trim(), duration: track.duration })),
+      tracks: tracksToSave.map((track) => ({ id: track.id, title: track.title.trim(), duration: track.duration, rating: track.rating })),
       mediaLinks: tracksToSave.filter((track) => track.youtubeUrl.trim()).map((track) => ({ id: `link-${track.id}`, url: track.youtubeUrl.trim(), label: `Play ${track.title.trim()}`, trackId: track.id })),
-      rating: initialAlbum?.rating,
+      rating: undefined,
       isFavorite: initialAlbum?.isFavorite ?? false,
       createdAt: initialAlbum?.createdAt ?? now,
       updatedAt: now,
     }
+    album.rating = calculateAlbumRating(album)
     saveAlbum.mutate(album)
   }
 
@@ -73,7 +75,7 @@ function AlbumEditorForm({ albumId, initialAlbum }: AlbumEditorFormProps) {
         <div className="form-row"><label>Release year<input required min="1900" max="2100" type="number" value={releaseYear} onChange={(event) => setReleaseYear(event.target.value)} placeholder="1957" /></label><label>Genre<input required value={genre} onChange={(event) => setGenre(event.target.value)} placeholder="Jazz" /></label></div>
         <label>Artwork URL <span className="label-note">optional</span><input type="url" value={artworkUrl} onChange={(event) => setArtworkUrl(event.target.value)} placeholder="https://..." /></label>
         <fieldset className="track-editor"><legend>Tracks and YouTube links</legend><p className="field-help">Add a YouTube URL to make that track playable inside the album page.</p>
-          {tracks.map((track, index) => <div className="track-draft" key={track.id}><span className="track-number">{String(index + 1).padStart(2, '0')}</span><div className="track-draft-fields"><input aria-label={`Track ${index + 1} title`} required value={track.title} onChange={(event) => updateTrack(track.id, 'title', event.target.value)} placeholder="Track title" /><div className="form-row"><input aria-label={`Track ${index + 1} duration`} value={track.duration} onChange={(event) => updateTrack(track.id, 'duration', event.target.value)} placeholder="Duration, e.g. 4:32" /><input aria-label={`Track ${index + 1} YouTube URL`} type="url" value={track.youtubeUrl} onChange={(event) => updateTrack(track.id, 'youtubeUrl', event.target.value)} placeholder="YouTube URL (optional)" /></div></div><button className="remove-track" type="button" onClick={() => setTracks((currentTracks) => currentTracks.filter((currentTrack) => currentTrack.id !== track.id))} aria-label={`Remove track ${index + 1}`}>×</button></div>)}
+          {tracks.map((track, index) => <div className="track-draft" key={track.id}><span className="track-number">{String(index + 1).padStart(2, '0')}</span><div className="track-draft-fields"><input aria-label={`Track ${index + 1} title`} required value={track.title} onChange={(event) => updateTrack(track.id, 'title', event.target.value)} placeholder="Track title" /><div className="form-row"><input aria-label={`Track ${index + 1} duration`} value={track.duration} onChange={(event) => updateTrack(track.id, 'duration', event.target.value)} placeholder="Duration, e.g. 4:32" /><select aria-label={`Track ${index + 1} rating`} value={track.rating ?? ''} onChange={(event) => setTracks((currentTracks) => currentTracks.map((currentTrack) => currentTrack.id === track.id ? { ...currentTrack, rating: event.target.value ? Number(event.target.value) as Track['rating'] : undefined } : currentTrack))}><option value="">Not rated</option><option value="1">1 star</option><option value="2">2 stars</option><option value="3">3 stars</option><option value="4">4 stars</option><option value="5">5 stars</option></select></div><input aria-label={`Track ${index + 1} YouTube URL`} type="url" value={track.youtubeUrl} onChange={(event) => updateTrack(track.id, 'youtubeUrl', event.target.value)} placeholder="YouTube URL (optional)" /></div><button className="remove-track" type="button" onClick={() => setTracks((currentTracks) => currentTracks.filter((currentTrack) => currentTrack.id !== track.id))} aria-label={`Remove track ${index + 1}`}>×</button></div>)}
           <button className="add-track-button" type="button" onClick={() => setTracks((currentTracks) => [...currentTracks, { id: createId('track'), title: '', duration: '', youtubeUrl: '' }])}>+ Add track</button>
         </fieldset>
         {saveAlbum.isError && <p className="form-error">The album could not be saved.</p>}

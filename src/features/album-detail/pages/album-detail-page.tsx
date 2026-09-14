@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { YouTubeTrackPlayer } from '../../music-player/components/youtube-track-player'
+import { calculateAlbumRating } from '../../../domain/album/album-rating'
 import { AlbumArtwork } from '../../../shared/components/album-artwork'
 import { RatingStars } from '../../../shared/components/rating-stars'
 import { CollectionItemRow } from '../components/collection-item-row'
@@ -42,7 +43,7 @@ export function AlbumDetailPage() {
           <p className="section-kicker">{album.genres[0]?.name} · {album.releaseYear}</p>
           <h1>{album.title}</h1>
           <p className="album-artist">{album.artists.map((artist) => artist.name).join(', ')}</p>
-          <div className="album-rating"><RatingStars rating={album.rating} /><span>{album.rating ? `${album.rating}.0 rating` : 'Not rated yet'}</span></div>
+          <div className="album-rating"><RatingStars rating={calculateAlbumRating(album)} /><span>{calculateAlbumRating(album) ? `${calculateAlbumRating(album)} average from rated tracks` : 'Rate tracks to score this album'}</span></div>
           <div className="album-tags">{album.tags.map((tag) => <span key={tag.id}>{tag.name}</span>)}</div>
           <div className="detail-actions"><Link className="secondary-button" to={`/albums/${album.id}/edit`}>Edit album</Link><button className="danger-button" disabled={deleteAlbum.isPending} onClick={handleDelete} type="button">{deleteAlbum.isPending ? 'Deleting...' : 'Delete album'}</button></div>
         </div>

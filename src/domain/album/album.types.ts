@@ -28,6 +28,7 @@ export type Track = {
   id: string
   title: string
   duration: string
+  rating?: number
 }
 
 export type MediaLink = {

@@ -1,7 +1,5 @@
-import type { AlbumRating } from '../../domain/album/album.types'
-
 type RatingStarsProps = {
-  rating?: AlbumRating
+  rating?: number
 }
 
 export function RatingStars({ rating }: RatingStarsProps) {

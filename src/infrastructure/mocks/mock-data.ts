@@ -21,11 +21,11 @@ export const mockAlbums: Album[] = [
     tags: [{ id: 'tag-essential', name: 'Essential' }, { id: 'tag-night-drive', name: 'Night drive' }],
     artwork: artwork('https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?auto=format&fit=crop&w=900&q=85', 'Prismatic vinyl record artwork'),
     tracks: [
-      { id: 'track-speak-to-me', title: 'Speak to Me', duration: '1:30' },
-      { id: 'track-breathe', title: 'Breathe (In the Air)', duration: '2:43' },
-      { id: 'track-time', title: 'Time', duration: '7:04' },
-      { id: 'track-money', title: 'Money', duration: '6:22' },
-      { id: 'track-us-and-them', title: 'Us and Them', duration: '7:49' },
+      { id: 'track-speak-to-me', title: 'Speak to Me', duration: '1:30', rating: 4 },
+      { id: 'track-breathe', title: 'Breathe (In the Air)', duration: '2:43', rating: 5 },
+      { id: 'track-time', title: 'Time', duration: '7:04', rating: 5 },
+      { id: 'track-money', title: 'Money', duration: '6:22', rating: 4 },
+      { id: 'track-us-and-them', title: 'Us and Them', duration: '7:49', rating: 5 },
     ],
     mediaLinks: [
       { id: 'link-dark-side-speak', url: 'https://www.youtube.com/watch?v=HrxX9TBj2zY', label: 'Play Speak to Me', trackId: 'track-speak-to-me' },
@@ -48,10 +48,10 @@ export const mockAlbums: Album[] = [
     tags: [{ id: 'tag-sunday', name: 'Slow Sunday' }],
     artwork: artwork('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=85', 'Blue stage lights and a microphone'),
     tracks: [
-      { id: 'track-so-what', title: 'So What', duration: '9:22' },
-      { id: 'track-freddie', title: 'Freddie Freeloader', duration: '9:46' },
-      { id: 'track-blue-in-green', title: 'Blue in Green', duration: '5:37' },
-      { id: 'track-all-blues', title: 'All Blues', duration: '11:33' },
+      { id: 'track-so-what', title: 'So What', duration: '9:22', rating: 5 },
+      { id: 'track-freddie', title: 'Freddie Freeloader', duration: '9:46', rating: 5 },
+      { id: 'track-blue-in-green', title: 'Blue in Green', duration: '5:37', rating: 5 },
+      { id: 'track-all-blues', title: 'All Blues', duration: '11:33', rating: 5 },
     ],
     mediaLinks: [
       { id: 'link-kind-blue-so-what', url: 'https://www.youtube.com/watch?v=kgRcCyey1qE', label: 'Play So What', trackId: 'track-so-what' },
@@ -73,10 +73,10 @@ export const mockAlbums: Album[] = [
     tags: [{ id: 'tag-80s', name: '80s' }, { id: 'tag-favorite', name: 'All-time favorite' }],
     artwork: artwork('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=900&q=85', 'Singer performing under warm red lights'),
     tracks: [
-      { id: 'track-running', title: 'Running Up That Hill', duration: '4:58' },
-      { id: 'track-hounds', title: 'Hounds of Love', duration: '3:02' },
-      { id: 'track-cloudbusting', title: 'Cloudbusting', duration: '5:10' },
-      { id: 'track-big-sky', title: 'The Big Sky', duration: '4:41' },
+      { id: 'track-running', title: 'Running Up That Hill', duration: '4:58', rating: 5 },
+      { id: 'track-hounds', title: 'Hounds of Love', duration: '3:02', rating: 4 },
+      { id: 'track-cloudbusting', title: 'Cloudbusting', duration: '5:10', rating: 4 },
+      { id: 'track-big-sky', title: 'The Big Sky', duration: '4:41', rating: 4 },
     ],
     mediaLinks: [
       { id: 'link-hounds-running', url: 'https://www.youtube.com/watch?v=wp43OdtAAkM', label: 'Play Running Up That Hill', trackId: 'track-running' },
@@ -98,9 +98,9 @@ export const mockAlbums: Album[] = [
     tags: [{ id: 'tag-blue-note', name: 'Blue Note' }],
     artwork: artwork('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=85', 'Vintage microphone in a recording studio'),
     tracks: [
-      { id: 'track-blue-train', title: 'Blue Train', duration: '10:40' },
-      { id: 'track-moment', title: 'Moment\'s Notice', duration: '9:10' },
-      { id: 'track-lazy-bird', title: 'Lazy Bird', duration: '7:00' },
+      { id: 'track-blue-train', title: 'Blue Train', duration: '10:40', rating: 5 },
+      { id: 'track-moment', title: 'Moment\'s Notice', duration: '9:10', rating: 4 },
+      { id: 'track-lazy-bird', title: 'Lazy Bird', duration: '7:00', rating: 4 },
     ],
     mediaLinks: [
       { id: 'link-blue-train-title', url: 'https://www.youtube.com/watch?v=HT_Zs5FKDZE', label: 'Play Blue Train', trackId: 'track-blue-train' },

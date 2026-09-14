@@ -28,6 +28,9 @@ describe('AlbumEditorPage', () => {
     await user.type(screen.getByLabelText('Artist'), 'Joni Mitchell')
     await user.type(screen.getByLabelText('Release year'), '1976')
     await user.type(screen.getByLabelText('Genre'), 'Singer-songwriter')
+    await user.click(screen.getByRole('button', { name: '+ Add track' }))
+    await user.type(screen.getByLabelText('Track 1 title'), 'Coyote')
+    await user.selectOptions(screen.getByLabelText('Track 1 rating'), '5')
     await user.click(screen.getByRole('button', { name: 'Save album' }))
 
     await waitFor(() => expect(screen.getByText('Album detail')).toBeInTheDocument())
