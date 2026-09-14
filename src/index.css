@@ -103,6 +103,13 @@ a { color: inherit; text-decoration: none; }
 .section-heading h2 { margin: 0; font: 600 31px/1 'Playfair Display', serif; }
 .section-heading > span { color: var(--muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; }
 .tracklist { list-style: none; padding: 0; margin: 0; }
+.tracklist-disclosure { border-bottom: 1px solid var(--line); }
+.tracklist-disclosure summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px 0; cursor: pointer; list-style: none; font: 600 31px/1 'Playfair Display', serif; }
+.tracklist-disclosure summary::-webkit-details-marker { display: none; }
+.tracklist-disclosure summary:focus-visible { outline: 2px solid var(--rust); outline-offset: 4px; }
+.tracklist-summary-meta { display: flex; align-items: center; gap: 13px; color: var(--muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; }
+.disclosure-chevron { display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid currentColor; border-radius: 50%; font: 18px/1 'DM Sans', sans-serif; transition: transform .2s ease; }
+.tracklist-disclosure[open] .disclosure-chevron { transform: rotate(45deg); }
 .tracklist li { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .tracklist li > span, .tracklist time { color: var(--muted); font: 10px 'DM Mono', monospace; }
 .tracklist strong { font-size: 13px; font-weight: 500; }

@@ -30,13 +30,12 @@ export function AlbumDetailPage() {
   const updateTrackRating = useMutation({
     mutationFn: async ({ trackId, rating }: { trackId: string; rating?: AlbumRating }) => {
       if (!album) return
-      const updatedAlbum = {
+      const albumWithoutRating = {
         ...album,
         tracks: album.tracks.map((track) => track.id === trackId ? { ...track, rating } : track),
-        rating: undefined,
         updatedAt: new Date().toISOString(),
       }
-      updatedAlbum.rating = calculateAlbumRating(updatedAlbum)
+      const updatedAlbum = { ...albumWithoutRating, rating: calculateAlbumRating(albumWithoutRating) }
       return repositories.albums.updateAlbum(updatedAlbum)
     },
     onSuccess: async (updatedAlbum) => {
@@ -69,11 +68,14 @@ export function AlbumDetailPage() {
       </section>
       <div className="detail-columns">
         <section className="tracklist-section">
-          <div className="section-heading"><div><p className="section-kicker">The music</p><h2>Track list</h2></div><span>{album.tracks.length} tracks</span></div>
-          <ol className="tracklist">
-            {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
-            <li className="track-add-row"><Link className="add-track-link" to={`/albums/${album.id}/edit`}><span aria-hidden="true">+</span> Add track</Link></li>
-          </ol>
+          <p className="section-kicker">The music</p>
+          <details className="tracklist-disclosure">
+            <summary><span>Track list Information</span><span className="tracklist-summary-meta">{album.tracks.length} tracks <span className="disclosure-chevron" aria-hidden="true">+</span></span></summary>
+            <ol className="tracklist">
+              {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
+              <li className="track-add-row"><Link className="add-track-link" to={`/albums/${album.id}/edit`}><span aria-hidden="true">+</span> Add track</Link></li>
+            </ol>
+          </details>
           <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} />
         </section>
         <section className="copies-section">

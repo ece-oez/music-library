@@ -50,7 +50,7 @@ export type Album = {
   artwork: Artwork
   tracks: Track[]
   mediaLinks: MediaLink[]
-  rating?: AlbumRating
+  rating?: number
   isFavorite: boolean
   createdAt: string
   updatedAt: string
