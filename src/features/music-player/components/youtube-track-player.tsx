@@ -55,9 +55,14 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
   const selectedTrack = playableTracks.find((entry) => entry.track.id === selectedTrackId)
   const playerContainerRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<YouTubePlayer | null>(null)
+  const selectedTrackIdRef = useRef(selectedTrackId)
 
   useEffect(() => {
-    if (playableTracks.length === 0 || !selectedTrack) return
+    selectedTrackIdRef.current = selectedTrackId
+  }, [selectedTrackId])
+
+  useEffect(() => {
+    if (playableTracks.length === 0) return
     let cancelled = false
     playerRef.current?.destroy()
     playerRef.current = null
@@ -71,7 +76,7 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
         events: {
           onStateChange: (event) => {
             if (event.data !== window.YT?.PlayerState.ENDED) return
-            const currentIndex = playableTracks.findIndex((entry) => entry.track.id === selectedTrack.track.id)
+            const currentIndex = playableTracks.findIndex((entry) => entry.track.id === selectedTrackIdRef.current)
             const nextTrack = playableTracks[currentIndex + 1]
             if (nextTrack) setSelectedTrackId(nextTrack.track.id)
           },
