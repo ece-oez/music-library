@@ -28,10 +28,15 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
 
   if (playableTracks.length === 0) return <div className="player-empty">Add track-specific YouTube URLs while editing this album to play it here.</div>
 
+  const appOrigin = window.location.origin
+  const playerUrl = selectedTrack
+    ? `https://www.youtube-nocookie.com/embed/${selectedTrack.videoId}?autoplay=1&rel=0&origin=${encodeURIComponent(appOrigin)}&widget_referrer=${encodeURIComponent(appOrigin)}`
+    : undefined
+
   return (
     <section className="music-player" aria-label="Album player">
       <div className="player-frame">
-        {selectedTrack && <iframe key={selectedTrack.videoId} title={`YouTube player for ${selectedTrack.track.title}`} src={`https://www.youtube-nocookie.com/embed/${selectedTrack.videoId}?autoplay=1&rel=0`} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />}
+        {selectedTrack && playerUrl && <iframe key={selectedTrack.videoId} title={`YouTube player for ${selectedTrack.track.title}`} src={playerUrl} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />}
       </div>
       <div className="player-now-playing"><span>Now playing</span><strong>{selectedTrack?.track.title}</strong></div>
       <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><time>{track.duration}</time></button>)}</div>
