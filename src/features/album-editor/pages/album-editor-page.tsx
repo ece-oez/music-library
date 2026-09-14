@@ -28,6 +28,19 @@ function AlbumEditorForm({ albumId, initialAlbum }: AlbumEditorFormProps) {
   const [genre, setGenre] = useState(initialAlbum?.genres[0]?.name ?? '')
   const [artworkUrl, setArtworkUrl] = useState(initialAlbum?.artwork.url ?? '')
   const [tracks, setTracks] = useState<TrackDraft[]>(initialAlbum ? toTrackDrafts(initialAlbum) : [])
+  const [playlistUrl, setPlaylistUrl] = useState('')
+
+  const importPlaylist = useMutation({
+    mutationFn: (url: string) => repositories.music.importYouTubePlaylist(url),
+    onSuccess: (importedAlbum) => {
+      setTitle(importedAlbum.title)
+      setArtist(importedAlbum.artist)
+      setReleaseYear(importedAlbum.releaseYear > 0 ? String(importedAlbum.releaseYear) : '')
+      setGenre(importedAlbum.genre)
+      setArtworkUrl(importedAlbum.artworkUrl ?? '')
+      setTracks(importedAlbum.tracks.map((track) => ({ id: createId('track'), title: track.title, duration: track.duration, youtubeUrl: track.youtubeUrl })))
+    },
+  })
 
   const saveAlbum = useMutation({
     mutationFn: (album: Album) => isEditing ? repositories.albums.updateAlbum(album) : repositories.albums.createAlbum(album),
@@ -70,9 +83,10 @@ function AlbumEditorForm({ albumId, initialAlbum }: AlbumEditorFormProps) {
       <Link className="back-link" to={isEditing ? `/albums/${albumId}` : '/collection'}>&lt; {isEditing ? 'Back to album' : 'Back to collection'}</Link>
       <div className="editor-heading"><p className="section-kicker">{isEditing ? 'Refine the record' : 'Add to the shelf'}</p><h1>{isEditing ? 'Edit album' : 'New album'}</h1><p>{isEditing ? 'Keep the music metadata and track links up to date.' : 'Start with the music and add its tracks.'}</p></div>
       <form className="editor-form" onSubmit={handleSubmit}>
+        {!isEditing && <fieldset className="playlist-import"><legend>Import from YouTube</legend><p className="field-help">Paste a public YouTube playlist URL. The playlist title, channel, artwork, tracks, durations and links will be imported.</p><div className="import-row"><input aria-label="YouTube playlist URL" type="url" value={playlistUrl} onChange={(event) => setPlaylistUrl(event.target.value)} placeholder="https://www.youtube.com/playlist?list=..." /><button className="secondary-button" disabled={importPlaylist.isPending || !playlistUrl.trim()} onClick={() => importPlaylist.mutate(playlistUrl.trim())} type="button">{importPlaylist.isPending ? 'Importing...' : 'Import playlist'}</button></div>{importPlaylist.isError && <p className="form-error">{importPlaylist.error instanceof Error ? importPlaylist.error.message : 'The YouTube playlist could not be imported.'}</p>}</fieldset>}
         <label>Album title<input required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Blue Train" /></label>
         <label>Artist<input required value={artist} onChange={(event) => setArtist(event.target.value)} placeholder="e.g. John Coltrane" /></label>
-        <div className="form-row"><label>Release year<input required min="1900" max="2100" type="number" value={releaseYear} onChange={(event) => setReleaseYear(event.target.value)} placeholder="1957" /></label><label>Genre<input required value={genre} onChange={(event) => setGenre(event.target.value)} placeholder="Jazz" /></label></div>
+        <div className="form-row"><label>Release year<input min="1900" max="2100" type="number" value={releaseYear} onChange={(event) => setReleaseYear(event.target.value)} placeholder="Unknown year" /></label><label>Genre<input required value={genre} onChange={(event) => setGenre(event.target.value)} placeholder="Jazz" /></label></div>
         <label>Artwork URL <span className="label-note">optional</span><input type="url" value={artworkUrl} onChange={(event) => setArtworkUrl(event.target.value)} placeholder="https://..." /></label>
         <fieldset className="track-editor"><legend>Tracks and YouTube links</legend><p className="field-help">Add a YouTube URL to make that track playable inside the album page.</p>
           {tracks.map((track, index) => <div className="track-draft" key={track.id}><span className="track-number">{String(index + 1).padStart(2, '0')}</span><div className="track-draft-fields"><input aria-label={`Track ${index + 1} title`} required value={track.title} onChange={(event) => updateTrack(track.id, 'title', event.target.value)} placeholder="Track title" /><div className="form-row"><input aria-label={`Track ${index + 1} duration`} value={track.duration} onChange={(event) => updateTrack(track.id, 'duration', event.target.value)} placeholder="Duration, e.g. 4:32" /><select aria-label={`Track ${index + 1} rating`} value={track.rating ?? ''} onChange={(event) => setTracks((currentTracks) => currentTracks.map((currentTrack) => currentTrack.id === track.id ? { ...currentTrack, rating: event.target.value ? Number(event.target.value) as Track['rating'] : undefined } : currentTrack))}><option value="">Not rated</option><option value="1">1 star</option><option value="2">2 stars</option><option value="3">3 stars</option><option value="4">4 stars</option><option value="5">5 stars</option></select></div><input aria-label={`Track ${index + 1} YouTube URL`} type="url" value={track.youtubeUrl} onChange={(event) => updateTrack(track.id, 'youtubeUrl', event.target.value)} placeholder="YouTube URL (optional)" /></div><button className="remove-track" type="button" onClick={() => setTracks((currentTracks) => currentTracks.filter((currentTrack) => currentTrack.id !== track.id))} aria-label={`Remove track ${index + 1}`}>×</button></div>)}

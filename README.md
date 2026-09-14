@@ -11,6 +11,21 @@ npm run dev
 
 Open the Vite URL shown in the terminal, usually `http://localhost:5173/`.
 
+## YouTube playlist import
+
+The import uses the YouTube Data API v3. Configure it locally before using the import button:
+
+1. In Google Cloud Console, create or select a project.
+2. Enable **YouTube Data API v3**.
+3. Create an API key and restrict it to the YouTube Data API.
+4. Copy `.env.example` to `.env.local` and set the key:
+
+```bash
+cp .env.example .env.local
+```
+
+Then replace `your-youtube-data-api-key` in `.env.local` and restart Vite with `npm run dev`. Never commit `.env.local` or expose an unrestricted API key. Because this is currently a frontend-only prototype, the key is technically visible in browser requests; a backend proxy should be used before production.
+
 ## Checks
 
 ```bash
