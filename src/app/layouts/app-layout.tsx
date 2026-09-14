@@ -4,11 +4,11 @@ export function AppLayout() {
   return (
     <div className="app-shell">
       <header className="site-header">
-        <NavLink className="brand" to="/collection" aria-label="Needle and Groove home">
+        <NavLink className="brand" to="/collection" aria-label="Tracks n Plates home">
           <span className="brand-mark" aria-hidden="true">NG</span>
           <span>
-            <strong>Needle &amp; Groove</strong>
-            <small>Our little record room</small>
+            <strong>Tracks n Plates</strong>
+            <small>Our shared record room</small>
           </span>
         </NavLink>
         <nav className="primary-nav" aria-label="Primary navigation">
@@ -19,7 +19,7 @@ export function AppLayout() {
       </header>
       <main className="page-content"><Outlet /></main>
       <footer className="site-footer">
-        <span>Needle &amp; Groove · private collection</span>
+        <span>Tracks n Plates · private collection</span>
         <span>Two listeners, one shelf</span>
       </footer>
     </div>

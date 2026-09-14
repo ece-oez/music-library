@@ -1,4 +1,4 @@
-# Needle & Groove
+# Tracks n Plates
 
 Private music collection library for CDs and vinyl records. The first stage uses mock repositories so the UI and domain model are ready for a future backend without coupling the features to a data provider.
 
