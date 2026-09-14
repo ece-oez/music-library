@@ -5,4 +5,5 @@ export interface AlbumRepository {
   getAlbumById(id: AlbumId): Promise<Album | undefined>
   createAlbum(album: Album): Promise<Album>
   updateAlbum(album: Album): Promise<Album>
+  deleteAlbum(id: AlbumId): Promise<void>
 }

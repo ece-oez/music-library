@@ -1,12 +1,34 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { YouTubeTrackPlayer } from '../../music-player/components/youtube-track-player'
 import { AlbumArtwork } from '../../../shared/components/album-artwork'
 import { RatingStars } from '../../../shared/components/rating-stars'
 import { CollectionItemRow } from '../components/collection-item-row'
 import { useAlbumDetail } from '../hooks/use-album-detail'
+import { repositories } from '../../../infrastructure/repositories'
 
 export function AlbumDetailPage() {
   const { albumId } = useParams<{ albumId: string }>()
   const { album, items, owners, isLoading, isError } = useAlbumDetail(albumId)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const deleteAlbum = useMutation({
+    mutationFn: async () => {
+      if (!albumId) return
+      await repositories.collectionItems.deleteCollectionItemsByAlbumId(albumId)
+      await repositories.albums.deleteAlbum(albumId)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['albums'] })
+      await queryClient.invalidateQueries({ queryKey: ['collection-items'] })
+      navigate('/collection')
+    },
+  })
+
+  function handleDelete() {
+    if (window.confirm(`Delete ${album?.title ?? 'this album'} and all physical copies?`)) deleteAlbum.mutate()
+  }
 
   if (isLoading) return <div className="state-panel page-state">Loading album details...</div>
   if (isError || !album) return <div className="state-panel page-state error">This album could not be found. <Link to="/collection">Back to collection</Link></div>
@@ -22,13 +44,13 @@ export function AlbumDetailPage() {
           <p className="album-artist">{album.artists.map((artist) => artist.name).join(', ')}</p>
           <div className="album-rating"><RatingStars rating={album.rating} /><span>{album.rating ? `${album.rating}.0 rating` : 'Not rated yet'}</span></div>
           <div className="album-tags">{album.tags.map((tag) => <span key={tag.id}>{tag.name}</span>)}</div>
-          {album.mediaLinks[0] && <a className="youtube-link" href={album.mediaLinks[0].url} target="_blank" rel="noreferrer"><span className="play-mark">▶</span> {album.mediaLinks[0].label}</a>}
+          <div className="detail-actions"><Link className="secondary-button" to={`/albums/${album.id}/edit`}>Edit album</Link><button className="danger-button" disabled={deleteAlbum.isPending} onClick={handleDelete} type="button">{deleteAlbum.isPending ? 'Deleting...' : 'Delete album'}</button></div>
         </div>
       </section>
       <div className="detail-columns">
         <section className="tracklist-section">
           <div className="section-heading"><div><p className="section-kicker">The music</p><h2>Track list</h2></div><span>{album.tracks.length} tracks</span></div>
-          <ol className="tracklist">{album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><time>{track.duration}</time></li>)}</ol>
+          <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} />
         </section>
         <section className="copies-section">
           <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><div className="section-heading-actions"><span>{items.length} total</span><Link className="text-action" to={`/albums/${album.id}/items/new`}>Add copy +</Link></div></div>

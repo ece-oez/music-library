@@ -3,6 +3,7 @@ import type {
   CollectionItem,
   CollectionItemId,
 } from '../../domain/collection-item/collection-item.types'
+import type { AlbumId } from '../../domain/album/album.types'
 import { mockCollectionItems } from './mock-data'
 
 const delay = async (): Promise<void> => {
@@ -32,5 +33,10 @@ export class MockCollectionItemRepository implements CollectionItemRepository {
     await delay()
     this.items = this.items.map((currentItem) => currentItem.id === item.id ? item : currentItem)
     return item
+  }
+
+  async deleteCollectionItemsByAlbumId(albumId: AlbumId): Promise<void> {
+    await delay()
+    this.items = this.items.filter((item) => item.albumId !== albumId)
   }
 }

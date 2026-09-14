@@ -8,4 +8,5 @@ export interface CollectionItemRepository {
   getCollectionItemById(id: CollectionItemId): Promise<CollectionItem | undefined>
   createCollectionItem(item: CollectionItem): Promise<CollectionItem>
   updateCollectionItem(item: CollectionItem): Promise<CollectionItem>
+  deleteCollectionItemsByAlbumId(albumId: string): Promise<void>
 }

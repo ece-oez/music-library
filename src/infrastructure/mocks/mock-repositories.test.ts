@@ -40,4 +40,15 @@ describe('mock repositories', () => {
     await repository.updateCollectionItem(updatedItem)
     expect(await repository.getCollectionItemById(item.id)).toEqual(updatedItem)
   })
+
+  it('deletes an album and its physical copies through their repositories', async () => {
+    const albumRepository = new MockAlbumRepository()
+    const itemRepository = new MockCollectionItemRepository()
+
+    await albumRepository.deleteAlbum('album-dark-side')
+    await itemRepository.deleteCollectionItemsByAlbumId('album-dark-side')
+
+    expect(await albumRepository.getAlbumById('album-dark-side')).toBeUndefined()
+    expect((await itemRepository.getCollectionItems()).some((item) => item.albumId === 'album-dark-side')).toBe(false)
+  })
 })

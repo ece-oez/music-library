@@ -30,4 +30,9 @@ export class MockAlbumRepository implements AlbumRepository {
     this.albums = this.albums.map((currentAlbum) => currentAlbum.id === album.id ? album : currentAlbum)
     return album
   }
+
+  async deleteAlbum(id: AlbumId): Promise<void> {
+    await delay()
+    this.albums = this.albums.filter((album) => album.id !== id)
+  }
 }
