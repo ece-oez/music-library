@@ -8,6 +8,7 @@ import { RatingStars } from '../../../shared/components/rating-stars'
 import { CollectionItemRow } from '../components/collection-item-row'
 import { useAlbumDetail } from '../hooks/use-album-detail'
 import { repositories } from '../../../infrastructure/repositories'
+import type { AlbumRating } from '../../../domain/album/album.types'
 
 export function AlbumDetailPage() {
   const { albumId } = useParams<{ albumId: string }>()
@@ -24,6 +25,24 @@ export function AlbumDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['albums'] })
       await queryClient.invalidateQueries({ queryKey: ['collection-items'] })
       navigate('/collection')
+    },
+  })
+  const updateTrackRating = useMutation({
+    mutationFn: async ({ trackId, rating }: { trackId: string; rating?: AlbumRating }) => {
+      if (!album) return
+      const updatedAlbum = {
+        ...album,
+        tracks: album.tracks.map((track) => track.id === trackId ? { ...track, rating } : track),
+        rating: undefined,
+        updatedAt: new Date().toISOString(),
+      }
+      updatedAlbum.rating = calculateAlbumRating(updatedAlbum)
+      return repositories.albums.updateAlbum(updatedAlbum)
+    },
+    onSuccess: async (updatedAlbum) => {
+      if (!updatedAlbum) return
+      await queryClient.invalidateQueries({ queryKey: ['albums'] })
+      await queryClient.invalidateQueries({ queryKey: ['album', updatedAlbum.id] })
     },
   })
 
@@ -51,11 +70,15 @@ export function AlbumDetailPage() {
       <div className="detail-columns">
         <section className="tracklist-section">
           <div className="section-heading"><div><p className="section-kicker">The music</p><h2>Track list</h2></div><span>{album.tracks.length} tracks</span></div>
+          <ol className="tracklist">
+            {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
+            <li className="track-add-row"><Link className="add-track-link" to={`/albums/${album.id}/edit`}><span aria-hidden="true">+</span> Add track</Link></li>
+          </ol>
           <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} />
         </section>
         <section className="copies-section">
           <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><div className="section-heading-actions"><span>{items.length} total</span><Link className="text-action" to={`/albums/${album.id}/items/new`}>Add copy +</Link></div></div>
-          <div className="item-list">{items.map((item) => <CollectionItemRow item={item} owner={owners.find((owner) => owner.id === item.ownerId)} key={item.id} />)}</div>
+          {items.length > 0 ? <div className="item-list">{items.map((item) => <CollectionItemRow item={item} owner={owners.find((owner) => owner.id === item.ownerId)} key={item.id} />)}</div> : <div className="copies-empty"><p>No physical copies on the shelf yet.</p><Link className="primary-button" to={`/albums/${album.id}/items/new`}>Add the first copy <span aria-hidden="true">+</span></Link></div>}
         </section>
       </div>
     </div>
