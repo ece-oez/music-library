@@ -120,4 +120,3 @@ export const collectionItems = pgTable('collection_items', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [check('collection_items_purchase_non_negative', sql`${table.purchaseAmount} is null or ${table.purchaseAmount} >= 0`), index('collection_items_album_index').on(table.albumId), index('collection_items_owner_index').on(table.ownerId)])
-EOF
