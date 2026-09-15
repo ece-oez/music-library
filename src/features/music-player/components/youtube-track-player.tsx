@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MediaLink, Track } from '../../../domain/album/album.types'
 import { RatingStars } from '../../../shared/components/rating-stars'
+import { getTrackRating } from '../../../domain/album/album-rating'
 
 type YouTubeTrackPlayerProps = {
   tracks: Track[]
   mediaLinks: MediaLink[]
   onTrackChange?: (trackId: string) => void
+  userId?: string
 }
 
 type YouTubePlayerEvent = { data: number }
@@ -50,7 +52,7 @@ function getVideoId(url: string): string | undefined {
   return undefined
 }
 
-export function YouTubeTrackPlayer({ tracks, mediaLinks, onTrackChange }: YouTubeTrackPlayerProps) {
+export function YouTubeTrackPlayer({ tracks, mediaLinks, onTrackChange, userId }: YouTubeTrackPlayerProps) {
   const playableTracks = useMemo(() => tracks.map((track) => ({ track, videoId: getVideoId(mediaLinks.find((link) => link.trackId === track.id)?.url ?? '') })).filter((entry): entry is { track: Track; videoId: string } => Boolean(entry.videoId)), [mediaLinks, tracks])
   const playableTrackKey = playableTracks.map(({ track, videoId }) => `${track.id}:${videoId}`).join('|')
   const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(playableTracks[0]?.track.id)
@@ -115,7 +117,7 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks, onTrackChange }: YouTub
     <section className="music-player" aria-label="Album player">
       <div className="player-frame" ref={playerContainerRef} data-testid="youtube-player-container" aria-label={selectedTrack ? `YouTube player for ${selectedTrack.track.title}` : 'YouTube player'} />
       <div className="player-now-playing"><span>Now playing</span><strong>{selectedTrack?.track.title}</strong></div>
-      <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><RatingStars rating={track.rating} /><time>{track.duration}</time></button>)}</div>
+      <div className="player-track-buttons">{playableTracks.map(({ track }) => <button className={track.id === selectedTrackId ? 'player-track active' : 'player-track'} key={track.id} onClick={() => setSelectedTrackId(track.id)} type="button"><span>{track.title}</span><RatingStars rating={getTrackRating(track, userId)} /><time>{track.duration}</time></button>)}</div>
     </section>
   )
 }

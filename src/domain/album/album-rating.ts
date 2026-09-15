@@ -1,9 +1,14 @@
 import type { Album, Track } from './album.types'
 
-export function calculateAlbumRating(album: Album): number | undefined {
-  const ratedTracks = album.tracks.filter((track): track is Track & { rating: number } => track.rating !== undefined)
-  if (ratedTracks.length === 0) return undefined
+export function getTrackRating(track: Track, userId?: string): number | undefined {
+  if (userId) return track.ratings?.find((rating) => rating.userId === userId)?.value
+  return track.ratings?.[0]?.value ?? track.rating
+}
 
-  const average = ratedTracks.reduce((total, track) => total + track.rating, 0) / ratedTracks.length
+export function calculateAlbumRating(album: Album): number | undefined {
+  const ratings = album.tracks.flatMap((track) => track.ratings?.map((rating) => rating.value) ?? (track.rating !== undefined ? [track.rating] : []))
+  if (ratings.length === 0) return undefined
+
+  const average = ratings.reduce((total, rating) => total + rating, 0) / ratings.length
   return Math.round(average * 2) / 2
 }

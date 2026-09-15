@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateAlbumRating } from './album-rating'
+import { calculateAlbumRating, getTrackRating } from './album-rating'
 import type { Album } from './album.types'
 
 const album = (ratings: (1 | 2 | 3 | 4 | 5 | undefined)[]): Album => ({
@@ -25,5 +25,17 @@ describe('calculateAlbumRating', () => {
 
   it('returns undefined when no track has been rated', () => {
     expect(calculateAlbumRating(album([undefined, undefined]))).toBeUndefined()
+  })
+
+  it('keeps ratings from different users on the same track', () => {
+    const sharedTrackAlbum = album([undefined])
+    sharedTrackAlbum.tracks[0].ratings = [
+      { userId: 'user-you', value: 5 },
+      { userId: 'user-mara', value: 2 },
+    ]
+
+    expect(getTrackRating(sharedTrackAlbum.tracks[0], 'user-you')).toBe(5)
+    expect(getTrackRating(sharedTrackAlbum.tracks[0], 'user-mara')).toBe(2)
+    expect(calculateAlbumRating(sharedTrackAlbum)).toBe(3.5)
   })
 })

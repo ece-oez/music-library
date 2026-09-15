@@ -67,7 +67,7 @@ function AlbumEditorForm({ albumId, initialAlbum }: AlbumEditorFormProps) {
       genres: [{ id: initialAlbum?.genres[0]?.id ?? createId('genre'), name: genre.trim() }],
       tags: initialAlbum?.tags ?? [],
       artwork: { url: artworkUrl.trim() || fallbackArtwork, alt: `${title.trim()} artwork`, source: 'mock' },
-      tracks: tracksToSave.map((track) => ({ id: track.id, title: track.title.trim(), duration: track.duration, rating: track.rating })),
+      tracks: tracksToSave.map((track) => ({ id: track.id, title: track.title.trim(), duration: track.duration, rating: track.rating, ratings: track.ratings })),
       mediaLinks: tracksToSave.filter((track) => track.youtubeUrl.trim()).map((track) => ({ id: `link-${track.id}`, url: track.youtubeUrl.trim(), label: `Play ${track.title.trim()}`, trackId: track.id })),
       rating: undefined,
       isFavorite: initialAlbum?.isFavorite ?? false,

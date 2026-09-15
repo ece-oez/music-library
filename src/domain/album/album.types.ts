@@ -29,6 +29,12 @@ export type Track = {
   title: string
   duration: string
   rating?: number
+  ratings?: TrackRating[]
+}
+
+export type TrackRating = {
+  userId: string
+  value: AlbumRating
 }
 
 export type MediaLink = {

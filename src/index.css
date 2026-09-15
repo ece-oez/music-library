@@ -38,6 +38,10 @@ a { color: inherit; text-decoration: none; }
 .nav-link-muted { cursor: default; }
 .nav-link-muted span { margin-left: 4px; color: var(--rust); font: 9px 'DM Mono', monospace; text-transform: uppercase; }
 .header-note { color: var(--muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+.header-account { display: flex; align-items: center; gap: 8px; }
+.account-avatar { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; color: white; font: 8px 'DM Mono', monospace; }
+.sign-out-button { padding: 0; border: 0; background: transparent; color: var(--muted); font: 9px 'DM Mono', monospace; text-transform: uppercase; }
+.sign-out-button:hover { color: var(--rust); }
 .status-dot { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; background: var(--teal); }
 .collection-page { padding: 68px 0 96px; }
 .collection-intro { display: flex; justify-content: space-between; align-items: end; padding-bottom: 55px; }
@@ -166,6 +170,17 @@ a { color: inherit; text-decoration: none; }
 .add-track-button { width: 100%; padding: 11px; margin-top: 10px; border: 1px dashed var(--line); background: transparent; color: var(--rust-dark); font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
 .add-track-button:hover { border-color: var(--rust); background: rgba(188, 84, 56, .06); }
 .page-state { margin-top: 30px; }
+.login-page { display: grid; grid-template-columns: minmax(260px, 420px) minmax(320px, 430px); justify-content: center; align-items: center; gap: 75px; min-height: 100vh; padding: 32px 24px; background: radial-gradient(circle at 20% 15%, rgba(232, 189, 84, .23), transparent 20rem), var(--paper); }
+.login-art { display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%; background: var(--ink); box-shadow: 18px 18px 0 rgba(40, 37, 37, .1); transform: rotate(-8deg); }
+.login-art span { color: var(--yellow); font: 700 clamp(70px, 12vw, 130px)/1 'Playfair Display', serif; }
+.login-panel { padding: 40px; border-top: 3px solid var(--ink); background: rgba(248, 245, 239, .72); }
+.login-panel h1 { margin: 0; font: 700 clamp(42px, 6vw, 64px)/.95 'Playfair Display', serif; letter-spacing: -.045em; }
+.login-copy { margin: 18px 0 28px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.login-form { display: grid; gap: 18px; }
+.login-form label { display: grid; gap: 8px; color: var(--muted); font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
+.login-form input { width: 100%; padding: 12px 13px; border: 1px solid var(--line); outline: 0; background: var(--paper); color: var(--ink); font: 14px 'DM Sans', sans-serif; }
+.login-form input:focus { border-color: var(--rust); box-shadow: 0 0 0 2px rgba(188, 84, 56, .12); }
+.login-demo { margin: 22px 0 0; color: var(--muted); font: 10px 'DM Mono', monospace; line-height: 1.6; }
 .primary-button, .secondary-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border: 1px solid var(--ink); font: 10px 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; }
 .primary-button { background: var(--rust); border-color: var(--rust); color: white; }
 .primary-button:hover { background: var(--rust-dark); border-color: var(--rust-dark); }
@@ -201,7 +216,7 @@ a { color: inherit; text-decoration: none; }
 .choice-card strong { color: var(--ink); font: 600 16px 'Playfair Display', serif; text-transform: none; letter-spacing: 0; }
 .choice-card span { color: var(--muted); font: 10px 'DM Sans', sans-serif; text-transform: none; letter-spacing: 0; }
 @media (max-width: 900px) { .collection-grid { grid-template-columns: repeat(3, 1fr); } .album-hero { grid-template-columns: minmax(230px, 330px) 1fr; gap: 38px; } .detail-columns { gap: 35px; } }
-@media (max-width: 680px) { .page-content, .site-header, .site-footer { width: min(100% - 32px, 560px); } .site-header { min-height: 76px; flex-wrap: wrap; gap: 12px; padding: 14px 0; } .primary-nav { order: 3; width: 100%; margin: 0; gap: 20px; } .header-note { display: none; } .collection-page { padding-top: 44px; } .collection-intro { align-items: start; padding-bottom: 36px; } .collection-stat { display: none; } .collection-toolbar { align-items: stretch; flex-direction: column; } .search-field { max-width: none; } .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 14px; } .collection-card h2 { font-size: 16px; } .collection-card-meta { display: block; } .copy-count { display: block; margin-top: 8px; } .album-detail-page { padding-top: 30px; } .album-hero { grid-template-columns: 1fr; gap: 33px; padding-bottom: 45px; } .album-detail-art { width: min(100%, 360px); } .detail-columns { grid-template-columns: 1fr; gap: 50px; } .site-footer { display: block; line-height: 1.8; } .site-footer span { display: block; } .editor-page { padding-top: 30px; } .editor-form { padding: 20px; } .form-row, .choice-row { grid-template-columns: 1fr; } .form-actions { justify-content: stretch; } .form-actions > * { flex: 1; } }
+@media (max-width: 680px) { .page-content, .site-header, .site-footer { width: min(100% - 32px, 560px); } .site-header { min-height: 76px; flex-wrap: wrap; gap: 12px; padding: 14px 0; } .primary-nav { order: 3; width: 100%; margin: 0; gap: 20px; } .header-note { display: none; } .collection-page { padding-top: 44px; } .collection-intro { align-items: start; padding-bottom: 36px; } .collection-stat { display: none; } .collection-toolbar { align-items: stretch; flex-direction: column; } .search-field { max-width: none; } .collection-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 14px; } .collection-card h2 { font-size: 16px; } .collection-card-meta { display: block; } .copy-count { display: block; margin-top: 8px; } .album-detail-page { padding-top: 30px; } .album-hero { grid-template-columns: 1fr; gap: 33px; padding-bottom: 45px; } .album-detail-art { width: min(100%, 360px); } .detail-columns { grid-template-columns: 1fr; gap: 50px; } .site-footer { display: block; line-height: 1.8; } .site-footer span { display: block; } .editor-page { padding-top: 30px; } .editor-form { padding: 20px; } .form-row, .choice-row { grid-template-columns: 1fr; } .form-actions { justify-content: stretch; } .form-actions > * { flex: 1; } .login-page { grid-template-columns: 1fr; gap: 30px; min-height: 100dvh; padding: 28px 16px; } .login-art { width: min(230px, 64vw); margin: 0 auto; } .login-panel { padding: 25px 20px; } }
 .tracklist-section, .copies-section, .music-player { min-width: 0; max-width: 100%; }
 @media (max-width: 680px) {
   .tracklist-summary-row { min-width: 0; }

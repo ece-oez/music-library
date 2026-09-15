@@ -3,17 +3,19 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { YouTubeTrackPlayer } from '../../music-player/components/youtube-track-player'
-import { calculateAlbumRating } from '../../../domain/album/album-rating'
+import { calculateAlbumRating, getTrackRating } from '../../../domain/album/album-rating'
 import { AlbumArtwork } from '../../../shared/components/album-artwork'
 import { RatingStars } from '../../../shared/components/rating-stars'
 import { CollectionItemRow } from '../components/collection-item-row'
 import { useAlbumDetail } from '../hooks/use-album-detail'
 import { repositories } from '../../../infrastructure/repositories'
 import type { AlbumRating } from '../../../domain/album/album.types'
+import { useAuth } from '../../../app/auth/auth-context'
 
 export function AlbumDetailPage() {
   const { albumId } = useParams<{ albumId: string }>()
   const { album, items, owners, isLoading, isError } = useAlbumDetail(albumId)
+  const { user } = useAuth()
   const [playingTrackId, setPlayingTrackId] = useState<string | undefined>()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const deleteDialogRef = useRef<HTMLDialogElement | null>(null)
@@ -36,7 +38,12 @@ export function AlbumDetailPage() {
       if (!album) return
       const albumWithoutRating = {
         ...album,
-        tracks: album.tracks.map((track) => track.id === trackId ? { ...track, rating } : track),
+        tracks: album.tracks.map((track) => {
+          if (track.id !== trackId || !user) return track
+          const ratings = [...(track.ratings ?? []).filter((trackRating) => trackRating.userId !== user.id)]
+          if (rating !== undefined) ratings.push({ userId: user.id, value: rating })
+          return { ...track, ratings, rating: undefined }
+        }),
         updatedAt: new Date().toISOString(),
       }
       const updatedAlbum = { ...albumWithoutRating, rating: calculateAlbumRating(albumWithoutRating) }
@@ -87,11 +94,11 @@ export function AlbumDetailPage() {
           <p className="section-kicker">The music</p>
           <div className="tracklist-summary-row"><details className="tracklist-disclosure"><summary>Track list Information</summary>
             <ol className="tracklist">
-              {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong className={playingTrackId === track.id ? 'track-title playing' : 'track-title'}>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
+              {album.tracks.map((track, index) => { const currentRating = getTrackRating(track, user?.id); return <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong className={playingTrackId === track.id ? 'track-title playing' : 'track-title'}>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={currentRating && rating <= currentRating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: currentRating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li> })}
               <li className="track-add-row"><Link className="add-track-link" to={`/albums/${album.id}/edit`}><span aria-hidden="true">+</span> Add track</Link></li>
             </ol>
           </details><span className="tracklist-summary-meta">{album.tracks.length} tracks</span></div>
-          <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} onTrackChange={setPlayingTrackId} />
+          <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} onTrackChange={setPlayingTrackId} userId={user?.id} />
         </section>
         <section className="copies-section">
           <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><div className="section-heading-actions"><span>{items.length} total</span><Link className="text-action" to={`/albums/${album.id}/items/new`}>Add copy +</Link></div></div>

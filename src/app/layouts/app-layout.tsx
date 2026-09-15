@@ -1,6 +1,9 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useAuth } from '../auth/auth-context'
 
 export function AppLayout() {
+  const { user, signOut } = useAuth()
+
   return (
     <div className="app-shell">
       <header className="site-header">
@@ -15,7 +18,7 @@ export function AppLayout() {
           <NavLink className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'} to="/collection">Collection</NavLink>
           <button className="nav-link nav-link-muted" type="button" disabled>Discover <span>soon</span></button>
         </nav>
-        <div className="header-note"><span className="status-dot" /> shared library</div>
+        <div className="header-account"><span className="account-avatar" style={{ backgroundColor: user?.accent }}>{user?.initials}</span><span className="header-note">{user?.displayName}</span><button className="sign-out-button" onClick={() => void signOut()} type="button">Sign out</button></div>
       </header>
       <main className="page-content"><Outlet /></main>
       <footer className="site-footer">

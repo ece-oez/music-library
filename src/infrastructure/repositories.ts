@@ -2,16 +2,19 @@ import type { AlbumRepository } from '../application/ports/album-repository'
 import type { CollectionItemRepository } from '../application/ports/collection-item-repository'
 import type { OwnerRepository } from '../application/ports/owner-repository'
 import type { MusicProvider } from '../application/ports/music-provider'
+import type { AuthService } from '../application/ports/auth-service'
 import { MockAlbumRepository } from './mocks/mock-album-repository'
 import { MockCollectionItemRepository } from './mocks/mock-collection-item-repository'
 import { MockOwnerRepository } from './mocks/mock-owner-repository'
 import { YouTubePlaylistProvider } from './music-providers/youtube-playlist-provider'
+import { MockAuthService } from './mocks/mock-auth-service'
 
 export type Repositories = {
   albums: AlbumRepository
   collectionItems: CollectionItemRepository
   owners: OwnerRepository
   music: MusicProvider
+  auth: AuthService
 }
 
 export const repositories: Repositories = {
@@ -19,4 +22,5 @@ export const repositories: Repositories = {
   collectionItems: new MockCollectionItemRepository(),
   owners: new MockOwnerRepository(),
   music: new YouTubePlaylistProvider(),
+  auth: new MockAuthService(),
 }
