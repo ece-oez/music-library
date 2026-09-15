@@ -52,7 +52,7 @@ export class YouTubePlaylistProvider implements MusicProvider {
   private readonly apiKey = import.meta.env.VITE_YOUTUBE_API_KEY as string | undefined
 
   async importYouTubePlaylist(url: string): Promise<ImportedAlbum> {
-    if (!this.apiKey) throw new Error('YouTube import is not configured. Add VITE_YOUTUBE_API_KEY to your environment.')
+    if (!this.apiKey || this.apiKey === 'your-youtube-data-api-key' || this.apiKey === 'dein-api-key-hier') throw new Error('YouTube import is not configured. Add VITE_YOUTUBE_API_KEY to your environment.')
     const playlistId = getPlaylistId(url)
     if (!playlistId) throw new Error('Enter a valid YouTube playlist URL containing a list parameter.')
 

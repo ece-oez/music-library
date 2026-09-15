@@ -5,6 +5,7 @@ import { RatingStars } from '../../../shared/components/rating-stars'
 type YouTubeTrackPlayerProps = {
   tracks: Track[]
   mediaLinks: MediaLink[]
+  onTrackChange?: (trackId: string) => void
 }
 
 type YouTubePlayerEvent = { data: number }
@@ -49,35 +50,47 @@ function getVideoId(url: string): string | undefined {
   return undefined
 }
 
-export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerProps) {
+export function YouTubeTrackPlayer({ tracks, mediaLinks, onTrackChange }: YouTubeTrackPlayerProps) {
   const playableTracks = useMemo(() => tracks.map((track) => ({ track, videoId: getVideoId(mediaLinks.find((link) => link.trackId === track.id)?.url ?? '') })).filter((entry): entry is { track: Track; videoId: string } => Boolean(entry.videoId)), [mediaLinks, tracks])
+  const playableTrackKey = playableTracks.map(({ track, videoId }) => `${track.id}:${videoId}`).join('|')
   const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(playableTracks[0]?.track.id)
   const selectedTrack = playableTracks.find((entry) => entry.track.id === selectedTrackId)
   const playerContainerRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<YouTubePlayer | null>(null)
   const selectedTrackIdRef = useRef(selectedTrackId)
+  const playableTracksRef = useRef(playableTracks)
 
   useEffect(() => {
     selectedTrackIdRef.current = selectedTrackId
   }, [selectedTrackId])
 
   useEffect(() => {
-    if (playableTracks.length === 0) return
+    playableTracksRef.current = playableTracks
+  }, [playableTracks])
+
+  useEffect(() => {
+    if (selectedTrackId) onTrackChange?.(selectedTrackId)
+  }, [onTrackChange, selectedTrackId])
+
+  useEffect(() => {
+    if (!playableTrackKey) return
     let cancelled = false
     playerRef.current?.destroy()
     playerRef.current = null
 
     loadYouTubeApi().then(() => {
       if (cancelled || !playerContainerRef.current || !window.YT) return
+      const firstTrack = playableTracksRef.current[0]
+      if (!firstTrack) return
       playerRef.current = new window.YT.Player(playerContainerRef.current, {
         host: 'https://www.youtube-nocookie.com',
-        videoId: playableTracks[0].videoId,
+        videoId: firstTrack.videoId,
         playerVars: { autoplay: 1, origin: window.location.origin, rel: 0 },
         events: {
           onStateChange: (event) => {
             if (event.data !== window.YT?.PlayerState.ENDED) return
-            const currentIndex = playableTracks.findIndex((entry) => entry.track.id === selectedTrackIdRef.current)
-            const nextTrack = playableTracks[currentIndex + 1]
+            const currentIndex = playableTracksRef.current.findIndex((entry) => entry.track.id === selectedTrackIdRef.current)
+            const nextTrack = playableTracksRef.current[currentIndex + 1]
             if (nextTrack) setSelectedTrackId(nextTrack.track.id)
           },
         },
@@ -89,11 +102,12 @@ export function YouTubeTrackPlayer({ tracks, mediaLinks }: YouTubeTrackPlayerPro
       playerRef.current?.destroy()
       playerRef.current = null
     }
-  }, [playableTracks])
+  }, [playableTrackKey])
 
+  const selectedVideoId = selectedTrack?.videoId
   useEffect(() => {
-    if (selectedTrack && playerRef.current) playerRef.current.loadVideoById(selectedTrack.videoId)
-  }, [selectedTrack])
+    if (selectedVideoId && playerRef.current) playerRef.current.loadVideoById(selectedVideoId)
+  }, [selectedVideoId])
 
   if (playableTracks.length === 0) return <div className="player-empty">Add track-specific YouTube URLs while editing this album to play it here.</div>
 

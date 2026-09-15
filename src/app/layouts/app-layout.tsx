@@ -5,7 +5,7 @@ export function AppLayout() {
     <div className="app-shell">
       <header className="site-header">
         <NavLink className="brand" to="/collection" aria-label="Tracks n Plates home">
-          <span className="brand-mark" aria-hidden="true">NG</span>
+          <span className="brand-mark"><img src="https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=160&q=85" alt="Vinyl record" /></span>
           <span>
             <strong>Tracks n Plates</strong>
             <small>Our shared record room</small>

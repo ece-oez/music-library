@@ -26,6 +26,7 @@ describe('YouTubePlaylistProvider', () => {
   })
 
   it('rejects invalid playlist URLs and missing configuration', async () => {
+    vi.stubEnv('VITE_YOUTUBE_API_KEY', '')
     await expect(new YouTubePlaylistProvider().importYouTubePlaylist('https://example.com/list=bad')).rejects.toThrow('not configured')
 
     vi.stubEnv('VITE_YOUTUBE_API_KEY', 'test-key')

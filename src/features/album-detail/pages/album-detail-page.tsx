@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 import { YouTubeTrackPlayer } from '../../music-player/components/youtube-track-player'
@@ -13,6 +14,9 @@ import type { AlbumRating } from '../../../domain/album/album.types'
 export function AlbumDetailPage() {
   const { albumId } = useParams<{ albumId: string }>()
   const { album, items, owners, isLoading, isError } = useAlbumDetail(albumId)
+  const [playingTrackId, setPlayingTrackId] = useState<string | undefined>()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const deleteDialogRef = useRef<HTMLDialogElement | null>(null)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const deleteAlbum = useMutation({
@@ -45,8 +49,20 @@ export function AlbumDetailPage() {
     },
   })
 
+  useEffect(() => {
+    const dialog = deleteDialogRef.current
+    if (!dialog) return
+    if (isDeleteDialogOpen && !dialog.open) dialog.showModal()
+    if (!isDeleteDialogOpen && dialog.open) dialog.close()
+  }, [isDeleteDialogOpen])
+
   function handleDelete() {
-    if (window.confirm(`Delete ${album?.title ?? 'this album'} and all physical copies?`)) deleteAlbum.mutate()
+    setIsDeleteDialogOpen(true)
+  }
+
+  function confirmDelete() {
+    setIsDeleteDialogOpen(false)
+    deleteAlbum.mutate()
   }
 
   if (isLoading) return <div className="state-panel page-state">Loading album details...</div>
@@ -71,17 +87,29 @@ export function AlbumDetailPage() {
           <p className="section-kicker">The music</p>
           <div className="tracklist-summary-row"><details className="tracklist-disclosure"><summary>Track list Information</summary>
             <ol className="tracklist">
-              {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
+              {album.tracks.map((track, index) => <li key={track.id}><span>{String(index + 1).padStart(2, '0')}</span><strong className={playingTrackId === track.id ? 'track-title playing' : 'track-title'}>{track.title}</strong><div className="track-rating" aria-label={`Rate ${track.title}`}>{[1, 2, 3, 4, 5].map((rating) => <button className={track.rating && rating <= track.rating ? 'track-star active' : 'track-star'} key={rating} onClick={() => updateTrackRating.mutate({ trackId: track.id, rating: track.rating === rating ? undefined : rating as AlbumRating })} type="button" aria-label={`${rating} star${rating === 1 ? '' : 's'}`}>*</button>)}</div><time>{track.duration}</time></li>)}
               <li className="track-add-row"><Link className="add-track-link" to={`/albums/${album.id}/edit`}><span aria-hidden="true">+</span> Add track</Link></li>
             </ol>
           </details><span className="tracklist-summary-meta">{album.tracks.length} tracks</span></div>
-          <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} />
+          <YouTubeTrackPlayer tracks={album.tracks} mediaLinks={album.mediaLinks} onTrackChange={setPlayingTrackId} />
         </section>
         <section className="copies-section">
           <div className="section-heading"><div><p className="section-kicker">On our shelf</p><h2>Our copies</h2></div><div className="section-heading-actions"><span>{items.length} total</span><Link className="text-action" to={`/albums/${album.id}/items/new`}>Add copy +</Link></div></div>
           {items.length > 0 ? <div className="item-list">{items.map((item) => <CollectionItemRow item={item} owner={owners.find((owner) => owner.id === item.ownerId)} key={item.id} />)}</div> : <div className="copies-empty"><p>No physical copies on the shelf yet.</p><Link className="primary-button" to={`/albums/${album.id}/items/new`}>Add the first copy <span aria-hidden="true">+</span></Link></div>}
         </section>
       </div>
+      <dialog className="delete-dialog" ref={deleteDialogRef} onCancel={() => setIsDeleteDialogOpen(false)}>
+        <div className="delete-dialog-art" aria-hidden="true">
+          <img src="https://cdn.undraw.co/illustration/computer-crash_jfs8.svg" alt="" onError={(event) => { event.currentTarget.style.display = 'none' }} />
+          <span className="delete-dialog-fallback">×</span>
+        </div>
+        <div className="delete-dialog-content">
+          <p className="section-kicker">Clear the shelf?</p>
+          <h2>Delete {album.title}?</h2>
+          <p>This removes the album and all physical copies from the shared collection. This cannot be undone.</p>
+          <div className="delete-dialog-actions"><button className="secondary-button" onClick={() => setIsDeleteDialogOpen(false)} type="button">Keep album</button><button className="danger-button" disabled={deleteAlbum.isPending} onClick={confirmDelete} type="button">Delete permanently</button></div>
+        </div>
+      </dialog>
     </div>
   )
 }
