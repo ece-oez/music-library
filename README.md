@@ -1,37 +1,152 @@
-# Tracks n Plates
+# 🎵 Tracks n Plates
 
-Private music collection library for CDs and vinyl records. The first stage uses mock repositories so the UI and domain model are ready for a future backend without coupling the features to a data provider.
+> A personal digital record shelf for collecting, discovering, and enjoying our CDs and vinyl records.
 
-## Run locally
+Tracks n Plates is a private music collection library built for two people who want to keep track of their physical music collection while still enjoying a modern digital music experience.
 
-```bash
-npm install
-npm run dev
-```
+The application combines album metadata, physical collection items, personal ratings, YouTube playback and a vintage-inspired music library experience.
 
-Open the Vite URL shown in the terminal, usually `http://localhost:5173/`.
+---
 
-## YouTube playlist import
+## ✨ Features
 
-The import uses the YouTube Data API v3. Configure it locally before using the import button:
+### 📚 Music Collection
 
-1. In Google Cloud Console, create or select a project.
-2. Enable **YouTube Data API v3**.
-3. Create an API key and restrict it to the YouTube Data API.
-4. Copy `.env.example` to `.env.local` and set the key:
+- Browse your complete CD and vinyl collection
+- Search albums and artists
+- Filter by media type
+- Filter favorites
+- Responsive collection grid
+- Separate album information from physical collection items
+- Support multiple physical copies of the same album
 
-```bash
-cp .env.example .env.local
-```
+### 💿 Physical Collection
 
-Then replace `your-youtube-data-api-key` in `.env.local` and restart Vite with `npm run dev`. Never commit `.env.local` or expose an unrestricted API key. Because this is currently a frontend-only prototype, the key is technically visible in browser requests; a backend proxy should be used before production.
+Each physical copy can have its own information:
 
-## Checks
+- Vinyl / CD
+- Owner
+- Condition
+- Personal notes
+- Favorite status
+- Personal rating
 
-```bash
-npm run build
-npm run lint
-npm test
-```
+This allows the same album to exist multiple times in the collection.
 
-The current application includes a responsive collection view with search and media/favorite filters, plus album detail pages showing tracks and separate physical copies.
+### 🎵 Album & Track Management
+
+- Album details
+- Tracklists
+- Individual track ratings
+- Album score calculation
+- Expandable track information
+- Album editing
+- Collection item editing
+
+### ▶️ YouTube Integration
+
+- Embedded YouTube playback
+- Automatic next-track playback
+- Stable player between tracks
+- YouTube playlist import
+- Import albums and tracks directly from YouTube playlists
+
+### 👤 Personal Experience
+
+- User authentication
+- Personal ratings
+- Personal favorites
+- Individual collection ownership
+
+---
+
+## 🖼️ Screenshots
+
+### Login
+
+<img width="2560" height="1440" alt="image" src="" />
+
+### Collection
+
+<img width="2560" height="1440" alt="image" src="" />
+
+### Album Details
+
+<img width="1920" height="1200" alt="image" src="" />
+
+> More screenshots will be added as the application evolves.
+
+---
+
+## 🚀 Live Demo
+
+The latest version of Tracks n Plates is available as a live demo:
+
+**[🎵 Open Tracks n Plates](https://tracks-n-plates.netlify.app/)**
+
+### Demo accounts
+
+You can try the application without creating an account.
+
+| Username | Password |
+|----------|----------|
+| `you` | `tracks` |
+| `mara` | `plates` |
+
+> The demo currently uses development/mock data. Do not use real or sensitive information.
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+- TanStack Query
+
+### Development & Testing
+
+- ESLint
+- Prettier
+- Vitest
+- React Testing Library
+
+### Planned
+
+The application is being prepared for a backend-based architecture with:
+
+- Node.js
+- TypeScript
+- Fastify
+- Drizzle ORM
+- PostgreSQL
+- Docker / Docker Compose
+
+---
+
+## 🏗️ Architecture
+
+The application is designed around a separation between the music domain and the data layer.
+
+A central concept is the separation between an **Album** and a **CollectionItem**.
+
+```text
+Album
+│
+├── Artist
+├── Tracks
+├── Artwork
+└── Metadata
+      │
+      ▼
+CollectionItem
+├── Media Type
+├── Owner
+├── Condition
+├── Rating
+├── Favorite
+└── Personal Notes
